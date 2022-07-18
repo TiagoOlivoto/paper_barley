@@ -1,0 +1,499 @@
+% Analysis 
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(cache = TRUE,
+                      comment = "##",
+                      collapse = TRUE,
+                      warning = FALSE,
+                      message = FALSE)
+
+```
+
+
+# Libraries
+
+To reproduce the examples of this material, the R packages the following packages are needed.
+
+```{r warning=FALSE, message=FALSE}
+
+library(EnvRtype)
+library(rio)
+library(ggh4x)
+library(ggridges)
+library(corrr)
+library(tidyverse)
+library(metan)
+
+my_theme <- 
+  theme_bw() +
+  theme(panel.spacing = unit(0, "cm"),
+        panel.grid = element_blank(),
+        legend.position = "bottom")
+```
+
+
+# Datasets
+## Traits
+```{r}
+df_traits <- 
+  import("https://bit.ly/df_barley") |> 
+  as_factor(1:6)
+
+```
+
+
+## Climate variables
+### Scripts to gather data
+
+```{r eval=FALSE}
+df_env <- import("https://bit.ly/3RvXlgj")
+ENV <- df_env$env |> as_character()
+LAT <- df_env$Lat
+LON <- df_env$Lon
+ALT <- df_env$Alt
+START <- df_env$Sowing
+END <- df_env$Harvesting
+
+# see more at https://github.com/allogamous/EnvRtype
+df_climate <-
+  get_weather(env.id = ENV,
+              lat = LAT,
+              lon = LON,
+              start.day = START,
+              end.day = END)
+# GDD: Growing Degree Day (oC/day)
+# FRUE: Effect of temperature on radiation use efficiency (from 0 to 1)
+# T2M_RANGE: Daily Temperature Range (oC day)
+# SPV: Slope of saturation vapour pressure curve (kPa.Celsius)
+# VPD: Vapour pressure deficit (kPa)
+# ETP: Potential Evapotranspiration (mm.day)
+# PEPT: Deficit by Precipitation (mm.day)
+# n: Actual duration of sunshine (hour)
+# N: Daylight hours (hour)
+# RTA: Extraterrestrial radiation (MJ/m^2/day)
+# SRAD: Solar radiation (MJ/m^2/day)
+# T2M: Temperature at 2 Meters
+# T2M_MAX: Maximum Temperature at 2 Meters
+# T2M_MIN: Minimum Temperature at 2 Meters
+# PRECTOT: Precipitation
+# WS2M: Wind Speed at 2 Meters
+# RH2M: Relative Humidity at 2 Meters
+# T2MDEW: Dew/Frost Point at 2 Meters
+# ALLSKY_SFC_LW_DWN: Downward Thermal Infrared (Longwave) Radiative Flux
+# ALLSKY_SFC_SW_DWN: All Sky Insolation Incident on a Horizontal Surface
+# ALLSKY_TOA_SW_DWN: Top-of-atmosphere Insolation
+# [1] "env"       "ETP"       "GDD"         "PETP"      "RH2M"      "SPV"
+# [8] "T2M"       "T2M_MAX"   "T2M_MIN"   "T2M_RANGE" "T2MDEW"    "VPD"
+
+# Compute other parameters
+env_data <-
+  df_climate %>%
+  as.data.frame() %>%
+  param_temperature(Tbase1 = 5, # choose the base temperature here
+                    Tbase2 = 28, # choose the base temperature here
+                    merge = TRUE) %>%
+  param_atmospheric(merge = TRUE) %>%
+  param_radiation(merge = TRUE)
+```
+
+### Tidy climate data
+```{r}
+env_data <- import("https://bit.ly/env_data_nasapower")
+str(env_data)
+id_var <- names(env_data)[10:19]
+```
+
+
+# Scripts
+## Correlation analysis of climate variables
+```{r }
+env_data |> 
+  select_cols(id_var) |> 
+  correlate() |> 
+  network_plot() +
+  guides(color = guide_colorbar(barheight = 1,
+                                barwidth = 20,
+                                ticks.colour = "black")) +
+  theme(legend.position = "bottom")
+
+ggsave("figs/fig1_network.png", width = 4, height = 4)
+
+```
+
+
+## Distribution of climate variables
+
+```{r}
+# long format for climate data
+env_data_d <-
+  env_data |>
+  remove_cols(LON:YYYYMMDD, daysFromStart) |>
+  pivot_longer(-env)
+
+# long format for grain yield
+df_gy_dist <- 
+  df_traits |> 
+  select(YEARS, GY) |> 
+  mutate(name = "GY", .after = YEARS) |>
+  rename(value = GY, 
+         env = YEARS)
+```
+
+
+```{r}
+# bind climate and GY
+env_data_d <- rbind(df_gy_dist, env_data_d)
+# mean values for each trait
+env_data_mean <- means_by(env_data_d, name)
+
+ggplot(env_data_d, aes(x = value, y = env, fill = env)) +
+  geom_density_ridges(scale = 0.9) +
+  geom_vline(data = env_data_mean,
+             aes(xintercept = value),
+             linetype = 2) +
+  facet_grid(~name, scales = "free") +
+  theme(panel.grid.minor = element_blank(),
+        legend.position = "bottom",
+        legend.title = element_blank()) +
+  scale_y_discrete(expand = expansion(c(0, 0.05))) +
+  labs(x = "Observed value",
+       y = "Density",
+       fill = "") +
+  my_theme
+
+ggsave("figs/fig2_density_climate.png", width = 12, height = 5)
+```
+
+
+
+## Environmental tipology {.panelset}
+```{r}
+names.window <- c('1-initial growing',
+                  '2-Tillering',
+                  '3-Boosting',
+                  '4-Heading/Flowering',
+                  "5-Grain filling",
+                  "6-Physiological maturity")
+
+out <- 
+  env_typing(env.data = env_data,
+             env.id = "env",
+             var.id = c("trange", "tmax", "tmin", "dbp", "etp", "vpd"),
+             by.interval = TRUE,
+             time.window = c(0, 15, 35, 65, 90, 140),
+             names.window = names.window)
+
+out2 <- 
+  separate(out,
+           env.variable,
+           into = c("var", "freq"),
+           sep = "_",
+           extra = "drop")
+
+```
+
+
+### tmax
+```{r}
+# plot the distribution of envirotypes for dbp
+p1 <-
+  out2 |> 
+  subset(var == "tmin") |> # change the variable here
+  ggplot() + 
+  geom_bar(aes(x=Freq, y=interval,fill=freq), 
+           position = "fill",
+           stat = "identity",
+           width = 1,
+           color = "white",
+           size=.2)+
+  facet_grid(~env, scales = "free", space = "free")+ 
+  scale_y_discrete(expand = c(0,0))+
+  scale_x_continuous(expand = c(0,0))+
+  xlab('Relative frequency of the maximum temperature (ºC)')+ 
+  ylab("Crop stage")+
+  labs(fill='Envirotype')+
+  theme(axis.title = element_text(size=12),
+        legend.text = element_text(size=9),
+        strip.text = element_text(size=12),
+        legend.title = element_text(size=12),
+        strip.background = element_rect(fill="gray95",size=1),
+        legend.position = 'bottom')
+```
+
+
+
+### vpd
+```{r}
+# plot the distribution of envirotypes for dbp
+
+p2 <-
+  out2 |> 
+  subset(var == "vpd") |> # change the variable here
+  ggplot() + 
+  geom_bar(aes(x=Freq, y=interval,fill=freq), 
+           position = "fill",
+           stat = "identity",
+           width = 1,
+           color = "white",
+           size=.2)+
+  facet_grid(~env, scales = "free", space = "free")+ 
+  scale_y_discrete(expand = c(0,0))+
+  scale_x_continuous(expand = c(0,0))+
+  xlab(expression(Relative~frequency~of~the~vapor~pressure~deficit~~(KPa~day^{-1})))+ 
+  ylab("Environment")+
+  labs(fill='Envirotype')+
+  theme(axis.title = element_text(size=12),
+        legend.text = element_text(size=9),
+        strip.text = element_text(size=12),
+        legend.title = element_text(size=12),
+        strip.background = element_rect(fill="gray95",size=1),
+        legend.position = 'bottom')
+
+```
+
+
+
+### dbp
+```{r fig.cap="Quantiles for maximum temperature (a), vapor pressure deficit (b), and deficit by precipitation (c) across distinct crop stages of barley growing in two crop seasons.", fig.width=10, fig.height=8}
+# plot the distribution of envirotypes for dbp
+
+p3 <-
+  out2 |> 
+  subset(var == "dbp") |> # change the variable here
+  ggplot() + 
+  geom_bar(aes(x=Freq, y=interval,fill=freq), 
+           position = "fill",
+           stat = "identity",
+           width = 1,
+           color = "white",
+           size=.2)+
+  facet_grid(~env, scales = "free", space = "free")+ 
+  scale_y_discrete(expand = c(0,0))+
+  scale_x_continuous(expand = c(0,0))+
+  xlab(expression(Relative~frequency~of~the~rainfall~deficit~~(mm~day^{-1})))+ 
+  ylab("Environment")+
+  labs(fill='Envirotype')+
+  theme(axis.title = element_text(size=12),
+        legend.text = element_text(size=9),
+        strip.text = element_text(size=12),
+        legend.title = element_text(size=12),
+        strip.background = element_rect(fill="gray95",size=1),
+        legend.position = 'bottom')
+
+
+arrange_ggplot(p1, p2, p3,
+               ncol = 1,
+               tag_levels = "a")
+ggsave("figs/fig3_typology.png", width = 10, height = 9)
+```
+
+
+# Joint analysis
+## Model
+```{r}
+mod <- 
+  gamem_met(df_traits,
+            env = ENV,
+            gen = GENOTYPES,
+            rep = REP,
+            block = IBLOCK,
+            resp = CAN:GY)
+```
+
+## LRT
+```{r}
+lrt <- gmd(mod, "lrt")
+lrt
+```
+
+## Variance components
+```{r}
+vcomp <- gmd(mod, "vcomp")
+vcomp
+
+plot(mod, type = "vcomp")
+ggsave("figs/fig4_vcomp.png", width = 8, height = 7)
+```
+
+
+
+# MGIDI appied to each environment
+## Model
+```{r}
+mod_env <-
+  gamem(df_traits,
+        gen = GENOTYPES,
+        rep = REP,
+        block = IBLOCK,
+        resp = CAN:GY,
+        by = ENV)
+```
+
+## correlation between traits
+```{r}
+df_traits |> 
+  select_numeric_cols() |> 
+  correlate() |> 
+  network_plot() +
+  guides(color = guide_colorbar(barheight = 1,
+                                barwidth = 20,
+                                ticks.colour = "black")) +
+  theme(legend.position = "bottom")
+
+
+ggsave("figs/fig5_network_traits.png", width = 4, height = 4)
+```
+
+
+## MGIDI index
+```{r}
+
+mgidi_di <- 
+  mgidi(mod_env,
+        ideotype = c("l, l, h, h, h, h"),
+        weights = c(1,1,2,1,1,5), # remove to consider equal heigths
+        SI = 5,
+        verbose = FALSE)
+```
+
+
+## Selected genotypes
+### Veen plot
+```{r}
+sels <- sel_gen(mgidi_di) |> split_factors(ENV)
+sel_2019DI <- sels$`2019DI`$data
+sel_2019FI <- sels$`2019FI`$data
+sel_2020DI <- sels$`2020DI`$data
+sel_2020FI <- sels$`2020FI`$data
+
+v1 <- 
+  venn_plot(sel_2019DI, sel_2020DI,
+            sel_2019FI, sel_2020FI,
+            names = c("2019DI", "2020DI", "2019FI", "2020FI"))
+
+
+
+# Selected in DI
+DI <- set_union(sel_2019DI, sel_2020DI)
+# Selected in FI
+FI <- set_union(sel_2019FI, sel_2020FI)
+
+
+v2 <- venn_plot(DI, FI)
+arrange_ggplot(v1, v2,
+               tag_levels = "a")
+
+ggsave("figs/fig6_venn.png", width = 12, height = 5)
+
+# only in DI (23)
+set_difference(DI, FI)
+
+# only in FI (18)
+set_difference(FI, DI)
+
+
+# in all environments
+set_intersect(sel_2019DI, sel_2020DI, sel_2019FI, sel_2020FI)
+
+```
+
+
+### MGIDI index for the selected genotypes
+```{r}
+
+df_mgidi <- 
+  gmd(mgidi_di, "MGIDI") |> 
+  mutate(selected = ifelse(Genotype %in% set_union(sel_2019DI, sel_2020DI,
+                                                   sel_2019FI, sel_2020FI),
+                           "Yes",
+                           "No")) |> 
+  subset(selected == "Yes")
+
+m1 <- 
+  ggplot(df_mgidi |> subset(ENV == "2019DI"),
+         aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
+  geom_line(aes(group = 1)) +
+  geom_point(size = 2.5) +
+  labs(x = "Multi-trait Genotype-Ideotype Distance Index",
+       y = "Genotypes") +
+  my_theme
+
+
+m2 <- 
+  ggplot(df_mgidi |> subset(ENV == "2020DI"),
+         aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
+  geom_line(aes(group = 1)) +
+  geom_point(size = 2.5) +
+  labs(x = "Multi-trait Genotype-Ideotype Distance Index",
+       y = "Genotypes") +
+  my_theme
+
+m3 <- 
+  ggplot(df_mgidi |> subset(ENV == "2019FI"),
+         aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
+  geom_line(aes(group = 1)) +
+  geom_point(size = 2.5) +
+  labs(x = "Multi-trait Genotype-Ideotype Distance Index",
+       y = "Genotypes") +
+  my_theme
+
+m4 <- 
+  ggplot(df_mgidi |> subset(ENV == "2020FI"),
+         aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
+  geom_line(aes(group = 1)) +
+  geom_point(size = 2.5) +
+  labs(x = "Multi-trait Genotype-Ideotype Distance Index",
+       y = "Genotypes") +
+  my_theme
+
+arrange_ggplot(m1, m2, m3, m4, ncol = 4)
+
+ggsave("figs/fig7_selected.png", width = 17, height = 8)
+
+```
+
+
+
+## Selection gains
+```{r}
+sel_gain <- 
+  gmd(mgidi_di) |> 
+  mutate(YEAR = extract_number(ENV),
+         STRESS = extract_string(ENV)) |> 
+  mutate(STRESS = ifelse(STRESS == "DI",
+                         "Deficit irrigation",
+                         "Full irrigation")) |> 
+  mutate(negative = ifelse(SDperc <= 0, "Negative", "Positive"))
+
+library(ggh4x)
+
+ggplot(sel_gain, aes(VAR, SGperc)) +
+  geom_hline(yintercept = 0, size = 0.2) +
+  geom_col(aes(fill = negative),
+           col = "black",
+           size = 0.2) +
+  scale_y_continuous(expand = expansion(mult = 0.1)) +
+  facet_nested(~YEAR + STRESS +sense, scales = "free", space = "free") +
+  geom_text(aes(label = round(SDperc, 2),
+                hjust = ifelse(SDperc > 0, -0.1, 1.1),
+                angle = 90),
+            size = 3) +
+  labs(x = "Traits",
+       y = "Selection gains (%)") +
+  my_theme +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_rect(color = "black",
+                                        fill = "white"))
+
+ggsave("figs/fig8_selection_gains.png", width = 12, height = 6)
+```
+
+
+
+# Section info
+```{r}
+sessionInfo()
+```
+

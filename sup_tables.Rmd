@@ -1,0 +1,81 @@
+% Supplementary table 
+
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(cache = TRUE,
+                      comment = "##",
+                      collapse = TRUE,
+                      warning = FALSE,
+                      message = FALSE)
+
+```
+
+
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+library(EnvRtype)
+library(rio)
+library(ggh4x)
+library(ggridges)
+library(corrr)
+library(tidyverse)
+library(metan)
+
+
+
+print_table = function(df,
+                       caption,
+                       digits = 2,
+                       full_width = TRUE,
+                       col.names = NA,
+                       longtable = FALSE,
+                       scape = FALSE,
+                       html_opt = c("striped", "responsive")){
+  library(kableExtra)
+  kable(df,
+        align  = "l",
+        col.names = col.names,
+        booktabs = T,
+        digits = digits,
+        format = "html",
+        linesep = "",
+        caption = caption,
+        escape = scape,
+        longtable = longtable) %>%
+    kable_classic(lightable_options = "striped", html_font = "sans", full_width = full_width) %>% 
+    kable_styling(bootstrap_options = html_opt)
+}
+```
+
+
+```{r echo=FALSE}
+df_traits <- 
+  import("https://bit.ly/df_barley") |> 
+  as_factor(1:6)
+
+```
+
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE }
+mod_env <-
+  gamem(df_traits,
+        gen = GENOTYPES,
+        rep = REP,
+        block = IBLOCK,
+        resp = CAN:GY,
+        by = ENV, 
+        verbose = FALSE)
+
+mgidi_di <- 
+  mgidi(mod_env,
+        ideotype = c("l, l, h, h, h, h"),
+        weights = c(1,1,2,1,1,5), # remove to consider equal heigths
+        SI = 5,
+        verbose = FALSE)
+
+factors <- gmd(mgidi_di) |> round_cols()
+print_table(factors, 
+            caption = "Selection gains and variables included in each factor for the four environments in the study.")
+```
