@@ -1,7 +1,7 @@
 % Analysis 
 
 ```{r global_options, include = FALSE}
-knitr::opts_chunk$set(cache = TRUE,
+knitr::opts_chunk$set(cache = FALSE,
                       comment = "##",
                       collapse = TRUE,
                       warning = FALSE,
@@ -198,7 +198,7 @@ out2 <-
 # plot the distribution of envirotypes for dbp
 p1 <-
   out2 |> 
-  subset(var == "tmin") |> # change the variable here
+  subset(var == "tmax") |> # change the variable here
   ggplot() + 
   geom_bar(aes(x=Freq, y=interval,fill=freq), 
            position = "fill",
@@ -219,7 +219,6 @@ p1 <-
         strip.background = element_rect(fill="gray95",size=1),
         legend.position = 'bottom')
 ```
-
 
 
 ### vpd
@@ -399,7 +398,7 @@ set_intersect(sel_2019DI, sel_2020DI, sel_2019FI, sel_2020FI)
 
 
 ### MGIDI index for the selected genotypes
-```{r}
+```{r, fig.cap="Selected genotypes ranked by the MGIDI in the environments 2019DI (a), 2020DI (b), 2019FI (c), and 2020FI (d)"}
 
 df_mgidi <- 
   gmd(mgidi_di, "MGIDI") |> 
@@ -446,7 +445,9 @@ m4 <-
        y = "Genotypes") +
   my_theme
 
-arrange_ggplot(m1, m2, m3, m4, ncol = 4)
+arrange_ggplot(m1, m2, m3, m4,
+               ncol = 4,
+               tag_levels = "a")
 
 ggsave("figs/fig7_selected.png", width = 17, height = 8)
 
