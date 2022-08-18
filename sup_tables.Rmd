@@ -57,25 +57,8 @@ df_traits <-
 ```
 
 
-
-```{r echo=FALSE, warning=FALSE, message=FALSE }
-mod_env <-
-  gamem(df_traits,
-        gen = GENOTYPES,
-        rep = REP,
-        block = IBLOCK,
-        resp = CAN:GY,
-        by = ENV, 
-        verbose = FALSE)
-
-mgidi_di <- 
-  mgidi(mod_env,
-        ideotype = c("l, l, h, h, h, h"),
-        weights = c(1,1,2,1,1,5), # remove to consider equal heigths
-        SI = 5,
-        verbose = FALSE)
-
-factors <- gmd(mgidi_di) |> round_cols()
-print_table(factors, 
-            caption = "Selection gains and variables included in each factor for the four environments in the study.")
+```{r}
+three <- import("data/three-way.xlsx")
+print_table(three, "Three-way ANOVA")
 ```
+

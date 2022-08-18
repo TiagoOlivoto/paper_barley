@@ -20,9 +20,12 @@ library(EnvRtype)
 library(rio)
 library(ggh4x)
 library(ggridges)
-library(corrr)
 library(tidyverse)
 library(metan)
+library(lmerTest)
+library(lme4)
+library(broom)
+library(broom.mixed)
 
 my_theme <- 
   theme_bw() +
@@ -108,15 +111,12 @@ id_var <- names(env_data)[10:19]
 ## Correlation analysis of climate variables
 ```{r }
 env_data |> 
-  select_cols(id_var) |> 
-  correlate() |> 
-  network_plot() +
-  guides(color = guide_colorbar(barheight = 1,
-                                barwidth = 20,
-                                ticks.colour = "black")) +
-  theme(legend.position = "bottom")
+  select_cols(all_of(id_var)) |> 
+  corr_coef() |> 
+  network_plot(min_cor = 0.3,
+               legend_position = "bottom") 
 
-ggsave("figs/fig1_network.png", width = 4, height = 4)
+ggsave("figs/fig1_network.png", width = 5, height = 5)
 
 ```
 
@@ -287,85 +287,179 @@ ggsave("figs/fig3_typology.png", width = 10, height = 9)
 ```
 
 
-# Joint analysis
+# Analysis 
 ## Model
 ```{r}
-mod <- 
-  gamem_met(df_traits,
-            env = ENV,
-            gen = GENOTYPES,
-            rep = REP,
-            block = IBLOCK,
-            resp = CAN:GY)
+# Pivot longer to analyze each variable with group_by()
+df_long <- 
+  df_traits |> 
+  pivot_longer(CAN:GY)
+
+models <- 
+  df_long %>% 
+  group_by(YEARS, name) %>%
+  doo(~lmer(value ~ STRESS + REP + (1|GENOTYPES) + (1|GENOTYPES:STRESS) + (1|REP:IBLOCK), data = .))
 ```
+
+
 
 ## LRT
 ```{r}
-lrt <- gmd(mod, "lrt")
-lrt
+LRT <- 
+  models |> 
+  mutate(data = map(data,
+                    ~.x %>% 
+                      lmerTest::ranova(., reduce.terms = TRUE) |> 
+                      rownames_to_column("term"))) |> 
+  unnest(data)
+
 ```
+
 
 ## Variance components
 ```{r}
-vcomp <- gmd(mod, "vcomp")
-vcomp
 
-plot(mod,
-     type = "vcomp",
-     trait.levels = "NDF, CAN, CH, GFD, PH, GY")
-ggsave("figs/fig4_vcomp.png", width = 4.5, height = 5)
+vcomp <- 
+  models |> 
+  mutate(data = map(data,
+                    ~.x %>% 
+                      lme4::VarCorr() |> 
+                      as.data.frame() |>       
+                      add_cols(Percent = (vcov / sum(vcov)) * 100))) |> 
+  unnest(data)
+
+
+ggplot(vcomp, aes(name, vcov, fill = grp)) +
+  geom_bar(stat = "identity",
+           position = "fill",
+           color = "black",
+           width = 1) +
+  facet_wrap(~YEARS) +
+  geom_text(aes(label = paste0(round(Percent, 2), "%")),
+            position = position_fill(vjust = .5),
+            size = 3) +
+  scale_y_continuous(expand = expansion(c(0, 0)),
+                     labels = function(x) paste0(x*100, "%")) +
+  scale_x_discrete(expand = expansion(0)) +
+  theme_bw()+
+  theme(legend.position = "bottom",
+        axis.ticks.length = unit(0.2, "cm"),
+        panel.grid = element_blank(),
+        legend.title = element_blank(),
+        strip.background = element_rect(fill = NA),
+        text = element_text(colour = "black"),
+        axis.text = element_text(colour = "black")) +
+  labs(x = "Assessed traits",
+       y = "Proportion of phenotypic variance")
+
+ggsave("figs/fig4_vcomp.png", width = 8, height = 6)
 ```
+
+
+# BLUPs for Genotype x Stress by Year
+```{r}
+
+blups <- 
+  models |> 
+  mutate(data = map(data,
+                    ~.x %>% 
+                      augment())) |> 
+  unnest(data) |> 
+  group_by(YEARS, name, STRESS, GENOTYPES) |> 
+  summarise(blup = mean(.fitted)) |> 
+  ungroup() |> 
+  pivot_wider(names_from = name, values_from = blup)
+
+blups
+
+```
+
+
+## correlation between traits
+
+```{r fig.cap="Correlation between traits under deficit irrigation (a) and full irrigation (b)"}
+cor_di <- 
+  blups |> 
+  filter(STRESS == "DI") |> 
+  corr_coef(CAN:PH) |> 
+  network_plot(legend_position = "bottom", show = "all")
+
+cor_fi <- 
+  blups |> 
+  filter(STRESS == "FI") |> 
+  corr_coef(CAN:PH) |> 
+  network_plot(legend_position = "bottom", show = "all")
+
+arrange_ggplot(cor_di, cor_fi,
+               guides = "collect",
+               tag_levels = "a")
+
+ggsave("figs/fig5_network_traits.png", width = 8, height = 5)
+```
+
 
 
 
 # MGIDI appied to each environment
-## Model
+
 ```{r}
-mod_env <-
-  gamem(df_traits,
-        gen = GENOTYPES,
-        rep = REP,
-        block = IBLOCK,
-        resp = CAN:GY,
-        by = ENV)
+blups_ys <- split_factors(blups, YEARS, STRESS)
+
 ```
 
-## correlation between traits
+## 2019 DI
 ```{r}
-df_traits |> 
-  select_numeric_cols() |> 
-  correlate() |> 
-  network_plot() +
-  guides(color = guide_colorbar(barheight = 1,
-                                barwidth = 20,
-                                ticks.colour = "black")) +
-  theme(legend.position = "bottom")
-
-
-ggsave("figs/fig5_network_traits.png", width = 4, height = 4)
+mgidi_2019_di <- 
+  blups_ys$`2019 | DI` |> 
+  column_to_rownames("GENOTYPES") |> 
+  mgidi(ideotype = c("l, h, h, h, l, h"),
+        weights = c(1,1,1,5,1,2), # remove to consider equal heigths
+        SI = 5,
+        verbose = FALSE)
 ```
 
-
-## MGIDI index
+## 2019 FU
 ```{r}
+mgidi_2019_fi <- 
+  blups_ys$`2019 | FI` |> 
+  column_to_rownames("GENOTYPES") |> 
+  mgidi(ideotype = c("l, h, h, h, l, h"),
+        weights = c(1,1,1,5,1,2), # remove to consider equal heigths
+        SI = 5,
+        verbose = FALSE)
+```
 
-mgidi_di <- 
-  mgidi(mod_env,
-        ideotype = c("l, l, h, h, h, h"),
-        weights = c(1,1,2,1,1,5), # remove to consider equal heigths
+## 2020 DI
+```{r}
+mgidi_2020_di <- 
+  blups_ys$`2020 | DI` |> 
+  column_to_rownames("GENOTYPES") |> 
+  mgidi(ideotype = c("l, h, h, h, l, h"),
+        weights = c(1,1,1,5,1,2), # remove to consider equal heigths
+        SI = 5,
+        verbose = FALSE)
+```
+
+## 2020 FU
+```{r}
+mgidi_2020_fi <- 
+  blups_ys$`2020 | FI` |> 
+  column_to_rownames("GENOTYPES") |> 
+  mgidi(ideotype = c("l, h, h, h, l, h"),
+        weights = c(1,1,1,5,1,2), # remove to consider equal heigths
         SI = 5,
         verbose = FALSE)
 ```
 
 
+
 ## Selected genotypes
-### Veen plot
+
 ```{r}
-sels <- sel_gen(mgidi_di) |> split_factors(ENV)
-sel_2019DI <- sels$`2019DI`$data
-sel_2019FI <- sels$`2019FI`$data
-sel_2020DI <- sels$`2020DI`$data
-sel_2020FI <- sels$`2020FI`$data
+sel_2019DI <- mgidi_2019_di |> sel_gen()
+sel_2019FI <- mgidi_2019_fi |> sel_gen()
+sel_2020DI <- mgidi_2020_di |> sel_gen()
+sel_2020FI <- mgidi_2020_fi |> sel_gen()
 
 v1 <- 
   venn_plot(sel_2019DI, sel_2020DI,
@@ -399,20 +493,17 @@ set_intersect(sel_2019DI, sel_2020DI, sel_2019FI, sel_2020FI)
 ```
 
 
-### MGIDI index for the selected genotypes
+## MGIDI index for the selected genotypes
 ```{r, fig.cap="Selected genotypes ranked by the MGIDI in the environments 2019DI (a), 2020DI (b), 2019FI (c), and 2020FI (d)"}
 
-df_mgidi <- 
-  gmd(mgidi_di, "MGIDI") |> 
+m1 <- 
+  gmd(mgidi_2019_di, "MGIDI") |> 
   mutate(selected = ifelse(Genotype %in% set_union(sel_2019DI, sel_2020DI,
                                                    sel_2019FI, sel_2020FI),
                            "Yes",
                            "No")) |> 
-  subset(selected == "Yes")
-
-m1 <- 
-  ggplot(df_mgidi |> subset(ENV == "2019DI"),
-         aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
+  subset(selected == "Yes") |> 
+  ggplot(aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
   geom_line(aes(group = 1)) +
   geom_point(size = 2.5) +
   labs(x = "Multi-trait Genotype-Ideotype Distance Index",
@@ -421,8 +512,13 @@ m1 <-
 
 
 m2 <- 
-  ggplot(df_mgidi |> subset(ENV == "2020DI"),
-         aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
+  gmd(mgidi_2019_fi, "MGIDI") |> 
+  mutate(selected = ifelse(Genotype %in% set_union(sel_2019DI, sel_2020DI,
+                                                   sel_2019FI, sel_2020FI),
+                           "Yes",
+                           "No")) |> 
+  subset(selected == "Yes") |> 
+  ggplot(aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
   geom_line(aes(group = 1)) +
   geom_point(size = 2.5) +
   labs(x = "Multi-trait Genotype-Ideotype Distance Index",
@@ -430,8 +526,13 @@ m2 <-
   my_theme
 
 m3 <- 
-  ggplot(df_mgidi |> subset(ENV == "2019FI"),
-         aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
+  gmd(mgidi_2020_di, "MGIDI") |> 
+  mutate(selected = ifelse(Genotype %in% set_union(sel_2019DI, sel_2020DI,
+                                                   sel_2019FI, sel_2020FI),
+                           "Yes",
+                           "No")) |> 
+  subset(selected == "Yes") |> 
+  ggplot(aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
   geom_line(aes(group = 1)) +
   geom_point(size = 2.5) +
   labs(x = "Multi-trait Genotype-Ideotype Distance Index",
@@ -439,8 +540,13 @@ m3 <-
   my_theme
 
 m4 <- 
-  ggplot(df_mgidi |> subset(ENV == "2020FI"),
-         aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
+  gmd(mgidi_2020_fi, "MGIDI") |> 
+  mutate(selected = ifelse(Genotype %in% set_union(sel_2019DI, sel_2020DI,
+                                                   sel_2019FI, sel_2020FI),
+                           "Yes",
+                           "No")) |> 
+  subset(selected == "Yes") |> 
+  ggplot(aes(x = MGIDI, y = reorder(Genotype, -MGIDI))) +
   geom_line(aes(group = 1)) +
   geom_point(size = 2.5) +
   labs(x = "Multi-trait Genotype-Ideotype Distance Index",
@@ -460,17 +566,18 @@ ggsave("figs/fig7_selected.png", width = 17, height = 8)
 ## Selection gains
 ```{r}
 sel_gain <- 
-  gmd(mgidi_di) |> 
-  mutate(YEAR = extract_number(ENV),
-         STRESS = extract_string(ENV)) |> 
-  mutate(STRESS = ifelse(STRESS == "DI",
-                         "Deficit irrigation",
-                         "Full irrigation")) |> 
+  list(
+    a = gmd(mgidi_2019_di) |> mutate(YEAR = 2019, STRESS = "Deficit irrigation"),
+    b = gmd(mgidi_2019_fi) |> mutate(YEAR = 2019, STRESS = "Full irrigation"),
+    c = gmd(mgidi_2020_di) |> mutate(YEAR = 2020, STRESS = "Deficit irrigation"),
+    d = gmd(mgidi_2020_fi) |> mutate(YEAR = 2020, STRESS = "Full irrigation")
+  ) |> 
+  bind_rows() |> 
   mutate(negative = ifelse(SDperc <= 0, "Negative", "Positive"))
 
 library(ggh4x)
 
-ggplot(sel_gain, aes(VAR, SGperc)) +
+ggplot(sel_gain, aes(VAR, SDperc)) +
   geom_hline(yintercept = 0, size = 0.2) +
   geom_col(aes(fill = negative),
            col = "black",
@@ -489,7 +596,6 @@ ggplot(sel_gain, aes(VAR, SGperc)) +
         panel.grid.minor = element_blank(),
         strip.background = element_rect(color = "black",
                                         fill = "white"))
-
 ggsave("figs/fig8_selection_gains.png", width = 12, height = 6)
 ```
 

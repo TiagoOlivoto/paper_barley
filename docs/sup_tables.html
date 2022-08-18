@@ -27,6 +27,71 @@
         <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
     
     
+        <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      .sourceCode { overflow: visible; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          color: #aaaaaa;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+      div.sourceCode
+        {  background-color: #f8f8f8; }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span.al { color: #ef2929; } /* Alert */
+      code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+      code span.at { color: #c4a000; } /* Attribute */
+      code span.bn { color: #0000cf; } /* BaseN */
+      code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+      code span.ch { color: #4e9a06; } /* Char */
+      code span.cn { color: #000000; } /* Constant */
+      code span.co { color: #8f5902; font-style: italic; } /* Comment */
+      code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+      code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+      code span.dt { color: #204a87; } /* DataType */
+      code span.dv { color: #0000cf; } /* DecVal */
+      code span.er { color: #a40000; font-weight: bold; } /* Error */
+      code span.ex { } /* Extension */
+      code span.fl { color: #0000cf; } /* Float */
+      code span.fu { color: #000000; } /* Function */
+      code span.im { } /* Import */
+      code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+      code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+      code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+      code span.ot { color: #8f5902; } /* Other */
+      code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+      code span.sc { color: #000000; } /* SpecialChar */
+      code span.ss { color: #4e9a06; } /* SpecialString */
+      code span.st { color: #4e9a06; } /* String */
+      code span.va { color: #000000; } /* Variable */
+      code span.vs { color: #4e9a06; } /* VerbatimString */
+      code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
     
     
     <!-- tabsets -->
@@ -199,961 +264,1140 @@
    
 <!-- Don't indent these lines or it will mess pre blocks indentation --> 
 <div id="main">
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>three <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">&quot;data/three-way.xlsx&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print_table</span>(three, <span class="st">&quot;Three-way ANOVA&quot;</span>)</span></code></pre></div>
 <table class=" lightable-classic lightable-striped table table-striped table-responsive" style="font-family: sans; margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;">
 <caption>
-<span id="tab:unnamed-chunk-3">Table 1: </span>Selection gains and variables included in each factor for the four environments in the study.
+<span id="tab:unnamed-chunk-3">Table 1: </span>Three-way ANOVA
 </caption>
 <thead>
 <tr>
 <th style="text-align:left;">
-ENV
+name
 </th>
 <th style="text-align:left;">
-VAR
+term
 </th>
 <th style="text-align:left;">
-Factor
+df
 </th>
 <th style="text-align:left;">
-Xo
+sumsq
 </th>
 <th style="text-align:left;">
-Xs
+meansq
 </th>
 <th style="text-align:left;">
-SD
+statistic
 </th>
 <th style="text-align:left;">
-SDperc
-</th>
-<th style="text-align:left;">
-h2
-</th>
-<th style="text-align:left;">
-SG
-</th>
-<th style="text-align:left;">
-SGperc
-</th>
-<th style="text-align:left;">
-sense
-</th>
-<th style="text-align:left;">
-goal
+p.value
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left;">
-2019DI
+CAN
 </td>
 <td style="text-align:left;">
-PH
+STRESS
 </td>
 <td style="text-align:left;">
-FA1
+1
 </td>
 <td style="text-align:left;">
-103.63
+22264.68
 </td>
 <td style="text-align:left;">
-110.63
+22264.68
 </td>
 <td style="text-align:left;">
-6.99
+34149.27
 </td>
 <td style="text-align:left;">
-6.75
-</td>
-<td style="text-align:left;">
-0.89
-</td>
-<td style="text-align:left;">
-6.22
-</td>
-<td style="text-align:left;">
-6.00
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
+0.00
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-2019DI
+CAN
 </td>
 <td style="text-align:left;">
-CH
+YEARS
 </td>
 <td style="text-align:left;">
-FA1
+1
 </td>
 <td style="text-align:left;">
-31.93
+4099.06
 </td>
 <td style="text-align:left;">
-33.36
+4099.06
 </td>
 <td style="text-align:left;">
-1.42
+6287.09
 </td>
 <td style="text-align:left;">
-4.46
-</td>
-<td style="text-align:left;">
-0.81
-</td>
-<td style="text-align:left;">
-1.15
-</td>
-<td style="text-align:left;">
-3.61
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
+0.00
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-2019DI
+CAN
 </td>
 <td style="text-align:left;">
-GY
+GENOTYPES
 </td>
 <td style="text-align:left;">
-FA1
+429
 </td>
 <td style="text-align:left;">
-3.40
+1734.47
 </td>
 <td style="text-align:left;">
 4.04
 </td>
 <td style="text-align:left;">
-0.64
+6.20
 </td>
 <td style="text-align:left;">
-18.78
-</td>
-<td style="text-align:left;">
-0.91
-</td>
-<td style="text-align:left;">
-0.58
-</td>
-<td style="text-align:left;">
-17.15
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
+0.00
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-2019DI
-</td>
 <td style="text-align:left;">
 CAN
 </td>
 <td style="text-align:left;">
-FA2
+STRESS:YEARS
 </td>
 <td style="text-align:left;">
-31.58
+1
 </td>
 <td style="text-align:left;">
-30.11
+23.89
 </td>
 <td style="text-align:left;">
--1.47
+23.89
 </td>
 <td style="text-align:left;">
--4.66
+36.65
 </td>
 <td style="text-align:left;">
-0.85
-</td>
-<td style="text-align:left;">
--1.25
-</td>
-<td style="text-align:left;">
--3.97
-</td>
-<td style="text-align:left;">
-decrease
-</td>
-<td style="text-align:left;">
-100
+0.00
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-2019DI
-</td>
-<td style="text-align:left;">
-NDF
-</td>
-<td style="text-align:left;">
-FA2
-</td>
-<td style="text-align:left;">
-86.80
-</td>
-<td style="text-align:left;">
-87.38
-</td>
-<td style="text-align:left;">
-0.58
-</td>
-<td style="text-align:left;">
-0.66
-</td>
-<td style="text-align:left;">
-0.92
-</td>
-<td style="text-align:left;">
-0.53
-</td>
-<td style="text-align:left;">
-0.61
-</td>
-<td style="text-align:left;">
-decrease
-</td>
-<td style="text-align:left;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019DI
-</td>
-<td style="text-align:left;">
-GFD
-</td>
-<td style="text-align:left;">
-FA2
-</td>
-<td style="text-align:left;">
-26.28
-</td>
-<td style="text-align:left;">
-25.91
-</td>
-<td style="text-align:left;">
--0.37
-</td>
-<td style="text-align:left;">
--1.40
-</td>
-<td style="text-align:left;">
-0.84
-</td>
-<td style="text-align:left;">
--0.31
-</td>
-<td style="text-align:left;">
--1.18
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019FI
-</td>
-<td style="text-align:left;">
-NDF
-</td>
-<td style="text-align:left;">
-FA1
-</td>
-<td style="text-align:left;">
-90.93
-</td>
-<td style="text-align:left;">
-92.81
-</td>
-<td style="text-align:left;">
-1.89
-</td>
-<td style="text-align:left;">
-2.07
-</td>
-<td style="text-align:left;">
-0.87
-</td>
-<td style="text-align:left;">
-1.65
-</td>
-<td style="text-align:left;">
-1.81
-</td>
-<td style="text-align:left;">
-decrease
-</td>
-<td style="text-align:left;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019FI
-</td>
-<td style="text-align:left;">
-PH
-</td>
-<td style="text-align:left;">
-FA1
-</td>
-<td style="text-align:left;">
-109.44
-</td>
-<td style="text-align:left;">
-115.11
-</td>
-<td style="text-align:left;">
-5.67
-</td>
-<td style="text-align:left;">
-5.18
-</td>
-<td style="text-align:left;">
-0.86
-</td>
-<td style="text-align:left;">
-4.87
-</td>
-<td style="text-align:left;">
-4.45
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019FI
-</td>
-<td style="text-align:left;">
-CH
-</td>
-<td style="text-align:left;">
-FA1
-</td>
-<td style="text-align:left;">
-35.25
-</td>
-<td style="text-align:left;">
-37.67
-</td>
-<td style="text-align:left;">
-2.42
-</td>
-<td style="text-align:left;">
-6.87
-</td>
-<td style="text-align:left;">
-0.87
-</td>
-<td style="text-align:left;">
-2.10
-</td>
-<td style="text-align:left;">
-5.96
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019FI
-</td>
-<td style="text-align:left;">
-GY
-</td>
-<td style="text-align:left;">
-FA1
-</td>
-<td style="text-align:left;">
-4.27
-</td>
-<td style="text-align:left;">
-5.40
-</td>
-<td style="text-align:left;">
-1.13
-</td>
-<td style="text-align:left;">
-26.47
-</td>
-<td style="text-align:left;">
-0.91
-</td>
-<td style="text-align:left;">
-1.03
-</td>
-<td style="text-align:left;">
-24.15
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2019FI
-</td>
 <td style="text-align:left;">
 CAN
 </td>
 <td style="text-align:left;">
-FA2
+STRESS:GENOTYPES
 </td>
 <td style="text-align:left;">
-26.32
+429
 </td>
 <td style="text-align:left;">
-26.24
+1413.67
 </td>
 <td style="text-align:left;">
--0.08
+3.30
 </td>
 <td style="text-align:left;">
--0.32
+5.05
 </td>
 <td style="text-align:left;">
-0.76
-</td>
-<td style="text-align:left;">
--0.06
-</td>
-<td style="text-align:left;">
--0.24
-</td>
-<td style="text-align:left;">
-decrease
-</td>
-<td style="text-align:left;">
-100
+0.00
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-2019FI
-</td>
-<td style="text-align:left;">
-GFD
-</td>
-<td style="text-align:left;">
-FA2
-</td>
-<td style="text-align:left;">
-30.85
-</td>
-<td style="text-align:left;">
-30.80
-</td>
-<td style="text-align:left;">
--0.04
-</td>
-<td style="text-align:left;">
--0.14
-</td>
-<td style="text-align:left;">
-0.80
-</td>
-<td style="text-align:left;">
--0.03
-</td>
-<td style="text-align:left;">
--0.11
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020DI
-</td>
-<td style="text-align:left;">
-PH
-</td>
-<td style="text-align:left;">
-FA1
-</td>
-<td style="text-align:left;">
-90.45
-</td>
-<td style="text-align:left;">
-98.60
-</td>
-<td style="text-align:left;">
-8.15
-</td>
-<td style="text-align:left;">
-9.01
-</td>
-<td style="text-align:left;">
-0.79
-</td>
-<td style="text-align:left;">
-6.48
-</td>
-<td style="text-align:left;">
-7.16
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020DI
-</td>
-<td style="text-align:left;">
-CH
-</td>
-<td style="text-align:left;">
-FA1
-</td>
-<td style="text-align:left;">
-28.03
-</td>
-<td style="text-align:left;">
-30.41
-</td>
-<td style="text-align:left;">
-2.38
-</td>
-<td style="text-align:left;">
-8.48
-</td>
-<td style="text-align:left;">
-0.77
-</td>
-<td style="text-align:left;">
-1.83
-</td>
-<td style="text-align:left;">
-6.53
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020DI
-</td>
-<td style="text-align:left;">
-GY
-</td>
-<td style="text-align:left;">
-FA1
-</td>
-<td style="text-align:left;">
-3.12
-</td>
-<td style="text-align:left;">
-3.54
-</td>
-<td style="text-align:left;">
-0.42
-</td>
-<td style="text-align:left;">
-13.61
-</td>
-<td style="text-align:left;">
-0.87
-</td>
-<td style="text-align:left;">
-0.37
-</td>
-<td style="text-align:left;">
-11.84
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020DI
-</td>
 <td style="text-align:left;">
 CAN
 </td>
 <td style="text-align:left;">
-FA2
+YEARS:GENOTYPES
 </td>
 <td style="text-align:left;">
-29.23
+429
 </td>
 <td style="text-align:left;">
-29.86
+1537.29
 </td>
 <td style="text-align:left;">
-0.64
-</td>
-<td style="text-align:left;">
-2.18
-</td>
-<td style="text-align:left;">
-0.79
-</td>
-<td style="text-align:left;">
-0.50
-</td>
-<td style="text-align:left;">
-1.73
-</td>
-<td style="text-align:left;">
-decrease
-</td>
-<td style="text-align:left;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020DI
-</td>
-<td style="text-align:left;">
-NDF
-</td>
-<td style="text-align:left;">
-FA2
-</td>
-<td style="text-align:left;">
-83.31
-</td>
-<td style="text-align:left;">
-82.98
-</td>
-<td style="text-align:left;">
--0.33
-</td>
-<td style="text-align:left;">
--0.40
-</td>
-<td style="text-align:left;">
-0.85
-</td>
-<td style="text-align:left;">
--0.28
-</td>
-<td style="text-align:left;">
--0.34
-</td>
-<td style="text-align:left;">
-decrease
-</td>
-<td style="text-align:left;">
-100
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020DI
-</td>
-<td style="text-align:left;">
-GFD
-</td>
-<td style="text-align:left;">
-FA2
-</td>
-<td style="text-align:left;">
-26.35
-</td>
-<td style="text-align:left;">
-26.79
-</td>
-<td style="text-align:left;">
-0.45
-</td>
-<td style="text-align:left;">
-1.70
-</td>
-<td style="text-align:left;">
-0.69
-</td>
-<td style="text-align:left;">
-0.31
-</td>
-<td style="text-align:left;">
-1.17
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-2020FI
-</td>
-<td style="text-align:left;">
-CAN
-</td>
-<td style="text-align:left;">
-FA1
-</td>
-<td style="text-align:left;">
-24.31
-</td>
-<td style="text-align:left;">
-25.93
-</td>
-<td style="text-align:left;">
-1.62
-</td>
-<td style="text-align:left;">
-6.67
-</td>
-<td style="text-align:left;">
-0.82
-</td>
-<td style="text-align:left;">
-1.34
+3.58
 </td>
 <td style="text-align:left;">
 5.50
 </td>
 <td style="text-align:left;">
-decrease
-</td>
-<td style="text-align:left;">
-0
+0.00
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-2020FI
+CAN
 </td>
 <td style="text-align:left;">
-NDF
+STRESS:YEARS:GENOTYPES
 </td>
 <td style="text-align:left;">
-FA1
+429
 </td>
 <td style="text-align:left;">
-87.32
+1223.28
 </td>
 <td style="text-align:left;">
-88.81
+2.85
 </td>
 <td style="text-align:left;">
-1.49
+4.37
 </td>
 <td style="text-align:left;">
-1.71
-</td>
-<td style="text-align:left;">
-0.85
-</td>
-<td style="text-align:left;">
-1.27
-</td>
-<td style="text-align:left;">
-1.45
-</td>
-<td style="text-align:left;">
-decrease
-</td>
-<td style="text-align:left;">
-0
+0.00
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-2020FI
+CAN
 </td>
 <td style="text-align:left;">
-PH
+Residuals
 </td>
 <td style="text-align:left;">
-FA1
+1720
 </td>
 <td style="text-align:left;">
-96.20
+1121.41
 </td>
 <td style="text-align:left;">
-103.57
+0.65
 </td>
 <td style="text-align:left;">
-7.37
+NA
 </td>
 <td style="text-align:left;">
-7.66
-</td>
-<td style="text-align:left;">
-0.86
-</td>
-<td style="text-align:left;">
-6.30
-</td>
-<td style="text-align:left;">
-6.55
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
+NA
 </td>
 </tr>
 <tr>
-<td style="text-align:left;">
-2020FI
-</td>
 <td style="text-align:left;">
 CH
 </td>
 <td style="text-align:left;">
-FA1
+STRESS
 </td>
 <td style="text-align:left;">
-31.58
+1
 </td>
 <td style="text-align:left;">
-34.77
+10132.23
 </td>
 <td style="text-align:left;">
-3.20
+10132.23
 </td>
 <td style="text-align:left;">
-10.13
+12155.09
 </td>
 <td style="text-align:left;">
-0.84
-</td>
-<td style="text-align:left;">
-2.68
-</td>
-<td style="text-align:left;">
-8.49
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
+0.00
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-2020FI
+CH
 </td>
+<td style="text-align:left;">
+YEARS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+12344.41
+</td>
+<td style="text-align:left;">
+12344.41
+</td>
+<td style="text-align:left;">
+14808.94
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CH
+</td>
+<td style="text-align:left;">
+GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+4440.15
+</td>
+<td style="text-align:left;">
+10.35
+</td>
+<td style="text-align:left;">
+12.42
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CH
+</td>
+<td style="text-align:left;">
+STRESS:YEARS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+10.87
+</td>
+<td style="text-align:left;">
+10.87
+</td>
+<td style="text-align:left;">
+13.04
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CH
+</td>
+<td style="text-align:left;">
+STRESS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+1450.36
+</td>
+<td style="text-align:left;">
+3.38
+</td>
+<td style="text-align:left;">
+4.06
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CH
+</td>
+<td style="text-align:left;">
+YEARS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+1152.65
+</td>
+<td style="text-align:left;">
+2.69
+</td>
+<td style="text-align:left;">
+3.22
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CH
+</td>
+<td style="text-align:left;">
+STRESS:YEARS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+1177.00
+</td>
+<td style="text-align:left;">
+2.74
+</td>
+<td style="text-align:left;">
+3.29
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CH
+</td>
+<td style="text-align:left;">
+Residuals
+</td>
+<td style="text-align:left;">
+1720
+</td>
+<td style="text-align:left;">
+1433.75
+</td>
+<td style="text-align:left;">
+0.83
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 GFD
 </td>
 <td style="text-align:left;">
-FA1
+STRESS
 </td>
 <td style="text-align:left;">
-31.35
+1
 </td>
 <td style="text-align:left;">
-31.64
+19713.73
 </td>
 <td style="text-align:left;">
-0.29
+19713.73
+</td>
+<td style="text-align:left;">
+69840.60
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GFD
+</td>
+<td style="text-align:left;">
+YEARS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+70.65
+</td>
+<td style="text-align:left;">
+70.65
+</td>
+<td style="text-align:left;">
+250.31
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GFD
+</td>
+<td style="text-align:left;">
+GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+800.64
+</td>
+<td style="text-align:left;">
+1.87
+</td>
+<td style="text-align:left;">
+6.61
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GFD
+</td>
+<td style="text-align:left;">
+STRESS:YEARS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+40.88
+</td>
+<td style="text-align:left;">
+40.88
+</td>
+<td style="text-align:left;">
+144.82
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GFD
+</td>
+<td style="text-align:left;">
+STRESS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+402.40
+</td>
+<td style="text-align:left;">
+0.94
+</td>
+<td style="text-align:left;">
+3.32
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GFD
+</td>
+<td style="text-align:left;">
+YEARS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+764.97
+</td>
+<td style="text-align:left;">
+1.78
+</td>
+<td style="text-align:left;">
+6.32
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GFD
+</td>
+<td style="text-align:left;">
+STRESS:YEARS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+392.75
 </td>
 <td style="text-align:left;">
 0.92
 </td>
 <td style="text-align:left;">
-0.68
+3.24
 </td>
 <td style="text-align:left;">
-0.20
-</td>
-<td style="text-align:left;">
-0.63
-</td>
-<td style="text-align:left;">
-increase
-</td>
-<td style="text-align:left;">
-100
+0.00
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-2020FI
+GFD
 </td>
+<td style="text-align:left;">
+Residuals
+</td>
+<td style="text-align:left;">
+1720
+</td>
+<td style="text-align:left;">
+485.50
+</td>
+<td style="text-align:left;">
+0.28
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
 <td style="text-align:left;">
 GY
 </td>
 <td style="text-align:left;">
-FA1
+STRESS
 </td>
 <td style="text-align:left;">
-3.85
+1
 </td>
 <td style="text-align:left;">
-4.63
+553.77
 </td>
 <td style="text-align:left;">
-0.78
+553.77
 </td>
 <td style="text-align:left;">
-20.22
+9667.41
 </td>
 <td style="text-align:left;">
-0.86
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GY
 </td>
 <td style="text-align:left;">
-0.67
+YEARS
 </td>
 <td style="text-align:left;">
-17.36
+1
 </td>
 <td style="text-align:left;">
-increase
+107.74
 </td>
 <td style="text-align:left;">
-100
+107.74
+</td>
+<td style="text-align:left;">
+1880.94
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GY
+</td>
+<td style="text-align:left;">
+GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+523.72
+</td>
+<td style="text-align:left;">
+1.22
+</td>
+<td style="text-align:left;">
+21.31
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GY
+</td>
+<td style="text-align:left;">
+STRESS:YEARS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+3.91
+</td>
+<td style="text-align:left;">
+3.91
+</td>
+<td style="text-align:left;">
+68.29
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GY
+</td>
+<td style="text-align:left;">
+STRESS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+82.61
+</td>
+<td style="text-align:left;">
+0.19
+</td>
+<td style="text-align:left;">
+3.36
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GY
+</td>
+<td style="text-align:left;">
+YEARS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+260.46
+</td>
+<td style="text-align:left;">
+0.61
+</td>
+<td style="text-align:left;">
+10.60
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GY
+</td>
+<td style="text-align:left;">
+STRESS:YEARS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+79.73
+</td>
+<td style="text-align:left;">
+0.19
+</td>
+<td style="text-align:left;">
+3.24
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GY
+</td>
+<td style="text-align:left;">
+Residuals
+</td>
+<td style="text-align:left;">
+1720
+</td>
+<td style="text-align:left;">
+98.52
+</td>
+<td style="text-align:left;">
+0.06
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NDF
+</td>
+<td style="text-align:left;">
+STRESS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+14240.12
+</td>
+<td style="text-align:left;">
+14240.12
+</td>
+<td style="text-align:left;">
+38180.83
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NDF
+</td>
+<td style="text-align:left;">
+YEARS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+10841.70
+</td>
+<td style="text-align:left;">
+10841.70
+</td>
+<td style="text-align:left;">
+29068.94
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NDF
+</td>
+<td style="text-align:left;">
+GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+2384.15
+</td>
+<td style="text-align:left;">
+5.56
+</td>
+<td style="text-align:left;">
+14.90
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NDF
+</td>
+<td style="text-align:left;">
+STRESS:YEARS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2.74
+</td>
+<td style="text-align:left;">
+2.74
+</td>
+<td style="text-align:left;">
+7.33
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NDF
+</td>
+<td style="text-align:left;">
+STRESS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+1712.01
+</td>
+<td style="text-align:left;">
+3.99
+</td>
+<td style="text-align:left;">
+10.70
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NDF
+</td>
+<td style="text-align:left;">
+YEARS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+801.92
+</td>
+<td style="text-align:left;">
+1.87
+</td>
+<td style="text-align:left;">
+5.01
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NDF
+</td>
+<td style="text-align:left;">
+STRESS:YEARS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+514.39
+</td>
+<td style="text-align:left;">
+1.20
+</td>
+<td style="text-align:left;">
+3.21
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NDF
+</td>
+<td style="text-align:left;">
+Residuals
+</td>
+<td style="text-align:left;">
+1720
+</td>
+<td style="text-align:left;">
+641.50
+</td>
+<td style="text-align:left;">
+0.37
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PH
+</td>
+<td style="text-align:left;">
+STRESS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+28750.88
+</td>
+<td style="text-align:left;">
+28750.88
+</td>
+<td style="text-align:left;">
+3174.14
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PH
+</td>
+<td style="text-align:left;">
+YEARS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+150070.88
+</td>
+<td style="text-align:left;">
+150070.88
+</td>
+<td style="text-align:left;">
+16568.05
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PH
+</td>
+<td style="text-align:left;">
+GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+66235.52
+</td>
+<td style="text-align:left;">
+154.40
+</td>
+<td style="text-align:left;">
+17.05
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PH
+</td>
+<td style="text-align:left;">
+STRESS:YEARS
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+0.59
+</td>
+<td style="text-align:left;">
+0.59
+</td>
+<td style="text-align:left;">
+0.06
+</td>
+<td style="text-align:left;">
+0.80
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PH
+</td>
+<td style="text-align:left;">
+STRESS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+10359.25
+</td>
+<td style="text-align:left;">
+24.15
+</td>
+<td style="text-align:left;">
+2.67
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PH
+</td>
+<td style="text-align:left;">
+YEARS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+24455.74
+</td>
+<td style="text-align:left;">
+57.01
+</td>
+<td style="text-align:left;">
+6.29
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PH
+</td>
+<td style="text-align:left;">
+STRESS:YEARS:GENOTYPES
+</td>
+<td style="text-align:left;">
+429
+</td>
+<td style="text-align:left;">
+9120.04
+</td>
+<td style="text-align:left;">
+21.26
+</td>
+<td style="text-align:left;">
+2.35
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PH
+</td>
+<td style="text-align:left;">
+Residuals
+</td>
+<td style="text-align:left;">
+1720
+</td>
+<td style="text-align:left;">
+15579.50
+</td>
+<td style="text-align:left;">
+9.06
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
 </td>
 </tr>
 </tbody>
